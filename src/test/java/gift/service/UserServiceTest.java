@@ -2,30 +2,43 @@ package gift.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 import gift.controller.user.dto.UserRequest;
+import gift.controller.user.dto.UserRequest.Create;
+import gift.model.User;
+import gift.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @Sql("/truncate.sql")
 public class UserServiceTest {
 
-    @Autowired
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
     private UserService userService;
 
     @Test
     @DisplayName("회원가입")
     void register() {
-        UserRequest.Create userRequest = new UserRequest.Create("yso8296", "yso8296@gmail.com");
+        given(userRepository.save(any())).willReturn(
+            new User(null, "yso8296", "yso8296@gmail.com"));
+        given(userRepository.existsByEmail(any())).willReturn(false);
 
-        Long id = userService.register(userRequest);
+        userService.register(new Create("yso8296", "yso8296@gmail.com"));
 
-        assertAll(
-            () -> assertThat(id).isNotNull()
-        );
+        then(userRepository).should().save(any());
     }
 }

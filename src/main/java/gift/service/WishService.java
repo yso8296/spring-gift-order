@@ -1,10 +1,10 @@
 package gift.service;
 
 import gift.common.dto.PageResponse;
-import gift.common.exception.ExistWishException;
-import gift.common.exception.ProductNotFoundException;
-import gift.common.exception.UserNotFoundException;
-import gift.common.exception.WishNotFoundException;
+import gift.common.exception.ErrorCode;
+import gift.common.exception.ProductException;
+import gift.common.exception.UserException;
+import gift.common.exception.WishException;
 import gift.controller.wish.dto.WishRequest;
 import gift.controller.wish.dto.WishResponse;
 import gift.model.Product;
@@ -47,13 +47,14 @@ public class WishService {
 
     @Transactional
     public Long addWistList(Long userId, WishRequest.Create request) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
 
         Product product = productRepository.findById(request.productId())
-            .orElseThrow(ProductNotFoundException::new);
+            .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
         if (wishRepository.existsByProductIdAndUserId(product.getId(), userId)) {
-            throw new ExistWishException();
+            throw new WishException(ErrorCode.EXIST_WISH);
         }
 
         Wish wish = wishRepository.save(request.toEntity(user, product, request.count()));
@@ -67,10 +68,11 @@ public class WishService {
             return;
         }
 
-        Wish wish = wishRepository.findById(wishId).orElseThrow(WishNotFoundException::new);
+        Wish wish = wishRepository.findById(wishId)
+            .orElseThrow(() -> new WishException(ErrorCode.WISH_NOT_FOUND));
 
         if (!wish.isOwner(userId)) {
-            throw new WishNotFoundException();
+            throw new WishException(ErrorCode.WISH_NOT_FOUND);
         }
 
         wish.updateWish(request.count());
@@ -78,10 +80,11 @@ public class WishService {
 
     @Transactional
     public void deleteWishList(Long userId, Long wishId) {
-        Wish wish = wishRepository.findById(wishId).orElseThrow(WishNotFoundException::new);
+        Wish wish = wishRepository.findById(wishId)
+            .orElseThrow(() -> new WishException(ErrorCode.WISH_NOT_FOUND));
 
         if (!wish.isOwner(userId)) {
-            throw new WishNotFoundException();
+            throw new WishException(ErrorCode.WISH_NOT_FOUND);
         }
 
         wishRepository.deleteById(wishId);

@@ -36,73 +36,45 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(problemDetail);
     }
 
-    @ExceptionHandler(ProductNotFoundException.class)
-    public ResponseEntity<ProblemDetail> productNotFoundException(ProductNotFoundException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-        problemDetail.setDetail(e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
-    }
-
-    @ExceptionHandler(ExistUserException.class)
-    public ResponseEntity<ProblemDetail> existUserException(ExistUserException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setDetail(e.getMessage());
-        return ResponseEntity.badRequest().body(problemDetail);
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ProblemDetail> userNotFoundException(UserNotFoundException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-        problemDetail.setDetail(e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
-    }
-
-    @ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<ProblemDetail> invalidTokenException(InvalidTokenException e) {
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ProblemDetail> invalidTokenException(JwtException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
         problemDetail.setDetail(e.getMessage());
         return ResponseEntity.badRequest().body(problemDetail);
     }
 
-    @ExceptionHandler(ExistWishException.class)
-    public ResponseEntity<ProblemDetail> existWishException(ExistWishException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setDetail(e.getMessage());
-        return ResponseEntity.badRequest().body(problemDetail);
-    }
-
-    @ExceptionHandler(WishNotFoundException.class)
-    public ResponseEntity<ProblemDetail> wishNotFoundException(WishNotFoundException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+    @ExceptionHandler(ProductException.class)
+    public ResponseEntity<ProblemDetail> productException(ProductException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(e.getHttpStatus());
         problemDetail.setDetail(e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ProblemDetail> illegalArgumentException(IllegalArgumentException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(UserException.class)
+    public ResponseEntity<ProblemDetail> userException(UserException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(e.getHttpStatus());
         problemDetail.setDetail(e.getMessage());
-        return ResponseEntity.badRequest().body(problemDetail);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
+    }
+
+    @ExceptionHandler(WishException.class)
+    public ResponseEntity<ProblemDetail> wishException(WishException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(e.getHttpStatus());
+        problemDetail.setDetail(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
   
-    @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<ProblemDetail> categoryNotFoundException(CategoryNotFoundException e) {
+    @ExceptionHandler(CategoryException.class)
+    public ResponseEntity<ProblemDetail> categoryException(CategoryException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         problemDetail.setDetail(e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
 
-    @ExceptionHandler(OptionNotFoundException.class)
-    public ResponseEntity<ProblemDetail> optionNotFoundException(OptionNotFoundException e) {
+    @ExceptionHandler(OptionException.class)
+    public ResponseEntity<ProblemDetail> optionException(OptionException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         problemDetail.setDetail(e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
-    }
-
-    @ExceptionHandler(DuplicateOptionNameException.class)
-    public ResponseEntity<ProblemDetail> duplicateOptionNameException(DuplicateOptionNameException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setDetail(e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
     }
 }

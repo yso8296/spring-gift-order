@@ -1,6 +1,6 @@
 package gift.common.auth;
 
-import gift.common.exception.InvalidTokenException;
+import gift.common.exception.JwtException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -20,10 +20,10 @@ public class JwtTokenProvider {
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         return Jwts.builder()
-            .setSubject(email)  // 식별하는데 사용되는 값
-            .setIssuedAt(now)   // 토큰 발행 시간
-            .setExpiration(validity) // 토큰 만료 시간
-            .claim("email", email)  // 클레임 설정
+            .setSubject(email)
+            .setIssuedAt(now)
+            .setExpiration(validity)
+            .claim("email", email)
             .signWith(SignatureAlgorithm.HS256, secretKey)
             .compact();
     }
@@ -33,15 +33,15 @@ public class JwtTokenProvider {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
+            throw new JwtException("유효하지 않은 토큰입니다.");
         } catch (ExpiredJwtException e) {
-            throw new InvalidTokenException("만료된 토큰입니다.");
+            throw new JwtException("만료된 토큰입니다.");
         } catch (UnsupportedJwtException e) {
-            throw new InvalidTokenException("지원되지 않는 토큰입니다.");
+            throw new JwtException("지원되지 않는 토큰입니다.");
         } catch (IllegalArgumentException e) {
-            throw new InvalidTokenException("토큰이 존재하지 않습니다.");
+            throw new JwtException("토큰이 존재하지 않습니다.");
         } catch (Exception e) {
-            throw new InvalidTokenException("유효하지 않은 토큰입니다.");
+            throw new JwtException("유효하지 않은 토큰입니다.");
         }
     }
 
