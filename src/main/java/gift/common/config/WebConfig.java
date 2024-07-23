@@ -14,15 +14,15 @@ public class WebConfig implements WebMvcConfigurer {
     private final TokenInterceptor tokenInterceptor;
     private final LoginUserArgumentResolver loginUserArgumentResolver;
 
-    public WebConfig(TokenInterceptor tokenInterceptor, LoginUserArgumentResolver loginUserArgumentResolver) {
+    public WebConfig(TokenInterceptor tokenInterceptor,
+        LoginUserArgumentResolver loginUserArgumentResolver) {
         this.tokenInterceptor = tokenInterceptor;
         this.loginUserArgumentResolver = loginUserArgumentResolver;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(tokenInterceptor).addPathPatterns("/**")
-            .excludePathPatterns("/api/v1/user/register", "/api/v1/user/login", "/admin/**", "/products", "/product");
+        registry.addInterceptor(tokenInterceptor).addPathPatterns("/api/v1/wish");
     }
 
     @Override
