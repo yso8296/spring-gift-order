@@ -1,6 +1,7 @@
 package gift.model;
 
-import gift.common.exception.DuplicateOptionNameException;
+import gift.common.exception.ErrorCode;
+import gift.common.exception.OptionException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -67,7 +68,9 @@ public class Product {
         return imageUrl;
     }
 
-    public Category getCategory() {return category;}
+    public Category getCategory() {
+        return category;
+    }
 
     public List<Option> getOptions() {
         return options;
@@ -84,7 +87,7 @@ public class Product {
             .anyMatch(option -> option.isDuplicateName(name));
 
         if (duplicate) {
-            throw new DuplicateOptionNameException();
+            throw new OptionException(ErrorCode.DUPLICATE_OPTION_NAME);
         }
     }
 

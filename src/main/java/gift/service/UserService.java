@@ -1,8 +1,8 @@
 package gift.service;
 
 import gift.common.auth.JwtTokenProvider;
-import gift.common.exception.ExistUserException;
-import gift.common.exception.UserNotFoundException;
+import gift.common.exception.ErrorCode;
+import gift.common.exception.UserException;
 import gift.controller.user.dto.UserRequest;
 import gift.model.User;
 import gift.repository.UserRepository;
@@ -24,14 +24,16 @@ public class UserService {
     @Transactional
     public Long register(UserRequest.Create userRequest) {
         if (userRepository.existsByEmail(userRequest.email())) {
-            throw new ExistUserException();
+            throw new UserException(ErrorCode.EXIST_USER);
         }
         User user = userRepository.save(userRequest.toEntity());
         return user.getId();
     }
 
     public String login(UserRequest.Update userRequest) {
-        User user = userRepository.findByEmail(userRequest.email()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByEmail(userRequest.email())
+            .orElseThrow(() -> new UserException(
+                ErrorCode.USER_NOT_FOUND));
         return jwtTokenProvider.createToken(user.getEmail());
     }
 }

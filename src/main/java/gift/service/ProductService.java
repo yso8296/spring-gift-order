@@ -1,8 +1,9 @@
 package gift.service;
 
 import gift.common.dto.PageResponse;
-import gift.common.exception.CategoryNotFoundException;
-import gift.common.exception.ProductNotFoundException;
+import gift.common.exception.CategoryException;
+import gift.common.exception.ErrorCode;
+import gift.common.exception.ProductException;
 import gift.controller.product.dto.ProductRequest;
 import gift.controller.product.dto.ProductResponse;
 import gift.model.Category;
@@ -25,7 +26,8 @@ public class ProductService {
     private final WishRepository wishRepository;
     private final CategoryRepository categoryRepository;
 
-    public ProductService(ProductRepository productRepository, WishRepository wishRepository, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository, WishRepository wishRepository,
+        CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.wishRepository = wishRepository;
         this.categoryRepository = categoryRepository;
@@ -34,7 +36,7 @@ public class ProductService {
     @Transactional
     public Long addProduct(ProductRequest.Create request) {
         Category category = categoryRepository.findById(request.categoryId()).orElseThrow(
-            CategoryNotFoundException::new);
+            () -> new CategoryException(ErrorCode.CATEGORY_NOT_FOUND));
         Option option = new Option(request.optionName(), request.quantity());
         Product product = request.toEntity(category);
 
@@ -45,7 +47,8 @@ public class ProductService {
     }
 
     public ProductResponse findProduct(Long id) {
-        Product product = productRepository.findById(id).orElseThrow(ProductNotFoundException::new);
+        Product product = productRepository.findById(id)
+            .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
         return ProductResponse.from(product);
     }
 
@@ -62,7 +65,7 @@ public class ProductService {
     @Transactional
     public ProductResponse updateProduct(Long id, ProductRequest.Update request) {
         Product product = productRepository.findById(id)
-            .orElseThrow(ProductNotFoundException::new);
+            .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
         product.updateProduct(request.name(), request.price(), request.imageUrl());
         return ProductResponse.from(product);
     }
@@ -70,10 +73,10 @@ public class ProductService {
     @Transactional
     public void deleteProduct(Long productId) {
         if (!productRepository.existsById(productId)) {
-            throw new ProductNotFoundException();
+            throw new ProductException(ErrorCode.PRODUCT_NOT_FOUND);
         }
         Product product = productRepository.findById(productId)
-            .orElseThrow(ProductNotFoundException::new);
+            .orElseThrow(() -> new ProductException(ErrorCode.PRODUCT_NOT_FOUND));
 
         wishRepository.deleteByProductId(productId);
         productRepository.deleteById(productId);

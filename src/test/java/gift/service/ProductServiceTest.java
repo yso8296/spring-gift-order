@@ -1,84 +1,119 @@
 package gift.service;
 
-/*@SpringBootTest
+
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+
+import gift.controller.product.dto.ProductRequest;
+import gift.controller.product.dto.ProductRequest.Create;
+import gift.controller.product.dto.ProductRequest.Update;
+import gift.model.Category;
+import gift.model.Product;
+import gift.repository.CategoryRepository;
+import gift.repository.ProductRepository;
+import gift.repository.WishRepository;
+import java.util.Optional;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.test.context.jdbc.Sql;
+
+@ExtendWith(MockitoExtension.class)
 @Sql("/truncate.sql")
 public class ProductServiceTest {
 
-    @Autowired
+
+    @Mock
+    private ProductRepository productRepository;
+
+    @Mock
+    private CategoryRepository categoryRepository;
+
+    @Mock
+    private WishRepository wishRepository;
+
+    @InjectMocks
     private ProductService productService;
 
     @Test
     @DisplayName("상품 등록")
     void save() {
-        CreateProductRequest createProductRequest = new CreateProductRequest("product1", 1000, "image1.jpg", 1L);
-        ProductResponse response = productService.addProduct(createProductRequest);
+        Category category = new Category(null, "상품", "red", "https://st.kakaocdn.net/category1.jpg",
+            "상품 카테고리입니다.");
+        Product product = new Product(null, "product1", 1000, "product.jpg", category);
+        ProductRequest.Create request = new Create("product1", 1000, "image1.jpg", 1L, "option1",
+            3);
+        given(categoryRepository.findById(any())).willReturn(Optional.of(category));
+        given(productRepository.save(any())).willReturn(product);
 
-        assertAll(
-            () -> assertThat(response.id()).isNotNull(),
-            () -> assertThat(response.name()).isEqualTo(createProductRequest.name()),
-            () -> assertThat(response.price()).isEqualTo(createProductRequest.price()),
-            () -> assertThat(response.imageUrl()).isEqualTo(createProductRequest.imageUrl())
-        );
+        productService.addProduct(request);
+
+        then(categoryRepository).should().findById(any());
+        then(productRepository).should().save(any());
     }
 
     @Test
     @DisplayName("상품 조회")
     void findById() {
-        CreateProductRequest createProductRequest = new CreateProductRequest("product1", 1000, "image1.jpg", 1L);
-        ProductResponse response = productService.addProduct(createProductRequest);
-        ProductResponse product = productService.findProduct(response.id());
+        Category category = new Category(null, "상품", "red", "https://st.kakaocdn.net/category1.jpg",
+            "상품 카테고리입니다.");
+        Product product = new Product(null, "product1", 1000, "product.jpg", category);
+        given(productRepository.findById(any())).willReturn(Optional.of(product));
 
-        assertAll(
-            () -> assertThat(product.id()).isNotNull(),
-            () -> assertThat(product.name()).isEqualTo(createProductRequest.name()),
-            () -> assertThat(product.price()).isEqualTo(createProductRequest.price()),
-            () -> assertThat(product.imageUrl()).isEqualTo(createProductRequest.imageUrl())
-        );
+        productService.findProduct(any());
+
+        then(productRepository).should().findById(any());
     }
 
     @Test
     @DisplayName("전체 상품 조회")
     void findAll() {
-        CreateProductRequest createProductRequest1 = new CreateProductRequest("product1", 1000, "image1.jpg", 1L);
-        CreateProductRequest createProductRequest2 = new CreateProductRequest("product2", 2000, "image2.jpg", 1L);
-        productService.addProduct(createProductRequest1);
-        productService.addProduct(createProductRequest2);
-
         Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
-        PageResponse<ProductResponse> products = productService.findAllProduct(pageable);
+        given(productRepository.findAll((Pageable) any())).willReturn(Page.empty());
 
-        assertThat(products.size()).isEqualTo(2);
+        productService.findAllProduct(pageable);
+
+        then(productRepository).should().findAll(pageable);
     }
 
     @Test
     @DisplayName("상품 수정")
     void update() {
-        CreateProductRequest createProductRequest = new CreateProductRequest("product1", 1000, "image1.jpg", 1L);
-        productService.addProduct(createProductRequest);
-        CreateProductRequest updateRequest = new CreateProductRequest("update1", 2000, "update1.jpg", 1L);
-        ProductResponse response = productService.addProduct(createProductRequest);
+        Category category = new Category(null, "상품", "red", "https://st.kakaocdn.net/category1.jpg",
+            "상품 카테고리입니다.");
+        Product product = new Product(null, "product1", 1000, "product.jpg", category);
+        given(productRepository.findById(any())).willReturn(Optional.of(product));
 
-        ProductResponse product = productService.updateProduct(response.id(), updateRequest);
+        productService.updateProduct(1L, new Update("product", 1000, "update.jpg", 1L));
 
-        assertAll(
-            () -> assertThat(product.name()).isEqualTo("update1"),
-            () -> assertThat(product.price()).isEqualTo(2000),
-            () -> assertThat(product.imageUrl()).isEqualTo("update1.jpg")
-        );
+        then(productRepository).should().findById(any());
     }
 
     @Test
     @DisplayName("상품 삭제")
     void delete() {
-        CreateProductRequest createProductRequest1 = new CreateProductRequest("product1", 1000, "image1.jpg", 1L);
-        CreateProductRequest createProductRequest2 = new CreateProductRequest("product2", 2000, "image2.jpg", 1L);
-        productService.addProduct(createProductRequest1);
-        productService.addProduct(createProductRequest2);
+        Category category = new Category(null, "상품", "red", "https://st.kakaocdn.net/category1.jpg",
+            "상품 카테고리입니다.");
+        Product product = new Product(1L, "product1", 1000, "product.jpg", category);
+        Long productId = product.getId();
+        given(productRepository.existsById(productId)).willReturn(true);
+        given(productRepository.findById(productId)).willReturn(Optional.of(product));
 
-        productService.deleteProduct(1L);
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("id").descending());
-        PageResponse<ProductResponse> products = productService.findAllProduct(pageable);
+        productService.deleteProduct(productId);
 
-        assertThat(products.size()).isEqualTo(1);
+        then(productRepository).should().existsById(productId);
+        then(productRepository).should().findById(productId);
+        then(wishRepository).should().deleteByProductId(productId);
+        then(productRepository).should().deleteById(productId);
     }
-}*/
+}

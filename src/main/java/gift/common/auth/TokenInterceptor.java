@@ -1,6 +1,6 @@
 package gift.common.auth;
 
-import gift.common.exception.InvalidTokenException;
+import gift.common.exception.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
@@ -19,10 +19,10 @@ public class TokenInterceptor implements HandlerInterceptor {
         String token = request.getHeader("Authorization");
 
         if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7); // "Bearer " 제거
+            token = token.substring(7);
             jwtTokenProvider.validateToken(token);
             return true;
         }
-        throw new InvalidTokenException("토큰이 없거나 Bearer 토큰이 아닙니다.");
+        throw new JwtException("토큰이 없거나 Bearer 토큰이 아닙니다.");
     }
 }

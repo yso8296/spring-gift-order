@@ -3,7 +3,8 @@ package gift.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import gift.common.exception.CategoryNotFoundException;
+import gift.common.exception.CategoryException;
+import gift.common.exception.ErrorCode;
 import gift.model.Category;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -37,9 +38,10 @@ public class CategoryRepositoryTest {
     @Test
     @DisplayName("카테고리 조회")
     void findById() {
-        Category category = categoryRepository.save(new Category(null, "차량", "brown", "www.aaa.jpg", "차량 카테고리입니다."));
+        Category category = categoryRepository.save(
+            new Category(null, "차량", "brown", "www.aaa.jpg", "차량 카테고리입니다."));
         Category actual = categoryRepository.findById(category.getId())
-            .orElseThrow(CategoryNotFoundException::new);
+            .orElseThrow(() -> new CategoryException(ErrorCode.CATEGORY_NOT_FOUND));
 
         assertThat(actual).isEqualTo(category);
     }
@@ -47,8 +49,10 @@ public class CategoryRepositoryTest {
     @Test
     @DisplayName("전체 카테고리 조회")
     void findAll() {
-        Category category1 = categoryRepository.save(new Category(null, "차량", "brown", "www.aaa.jpg", "차량 카테고리입니다."));
-        Category category2 = categoryRepository.save(new Category(null, "상품권", "brown", "www.aaa.jpg", "상품권 카테고리입니다."));
+        Category category1 = categoryRepository.save(
+            new Category(null, "차량", "brown", "www.aaa.jpg", "차량 카테고리입니다."));
+        Category category2 = categoryRepository.save(
+            new Category(null, "상품권", "brown", "www.aaa.jpg", "상품권 카테고리입니다."));
 
         List<Category> categories = categoryRepository.findAll();
 

@@ -1,5 +1,7 @@
 package gift.model;
 
+import gift.common.exception.ErrorCode;
+import gift.common.exception.OptionException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -74,7 +76,7 @@ public class Option {
 
     public void subtractQuantity(int count) {
         if (quantity < count) {
-            throw new IllegalArgumentException("현재 재고보다 많이 삭제할 수 없습니다.");
+            throw new OptionException(ErrorCode.NOT_ENOUGH_QUANTITY);
         }
         quantity -= count;
     }

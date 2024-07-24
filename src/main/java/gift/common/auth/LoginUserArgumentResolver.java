@@ -1,7 +1,8 @@
 package gift.common.auth;
 
 import gift.common.annotation.LoginUser;
-import gift.common.exception.UserNotFoundException;
+import gift.common.exception.ErrorCode;
+import gift.common.exception.UserException;
 import gift.model.User;
 import gift.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +35,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String token = request.getHeader("Authorization").substring(7);
         String email = jwtTokenProvider.extractEmail(token);
-        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
         return new LoginInfo(user.getId(), user.getPassword(), user.getEmail());
     }
 }

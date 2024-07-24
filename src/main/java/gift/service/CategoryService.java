@@ -1,7 +1,8 @@
 package gift.service;
 
 import gift.common.dto.PageResponse;
-import gift.common.exception.CategoryNotFoundException;
+import gift.common.exception.CategoryException;
+import gift.common.exception.ErrorCode;
 import gift.controller.category.dto.CategoryRequest;
 import gift.controller.category.dto.CategoryResponse;
 import gift.model.Category;
@@ -43,14 +44,14 @@ public class CategoryService {
 
     public CategoryResponse findCategory(Long id) {
         Category category = categoryRepository.findById(id)
-            .orElseThrow(CategoryNotFoundException::new);
+            .orElseThrow(() -> new CategoryException(ErrorCode.CATEGORY_NOT_FOUND));
         return CategoryResponse.from(category);
     }
 
     @Transactional
     public CategoryResponse updateCategory(Long id, CategoryRequest.Update request) {
         Category category = categoryRepository.findById(id)
-            .orElseThrow(CategoryNotFoundException::new);
+            .orElseThrow(() -> new CategoryException(ErrorCode.CATEGORY_NOT_FOUND));
         category.updateCategory(request.name(), request.color(), request.imageUrl(),
             request.description());
         return CategoryResponse.from(category);
@@ -63,10 +64,10 @@ public class CategoryService {
         }
 
         if (!categoryRepository.existsById(categoryId)) {
-            throw new CategoryNotFoundException();
+            throw new CategoryException(ErrorCode.CATEGORY_NOT_FOUND);
         }
         Category category = categoryRepository.findById(categoryId)
-            .orElseThrow(CategoryNotFoundException::new);
+            .orElseThrow(() -> new CategoryException(ErrorCode.CATEGORY_NOT_FOUND));
 
         productRepository.updateCategory(categoryId, defaultId);
         categoryRepository.deleteById(categoryId);
