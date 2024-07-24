@@ -16,3 +16,6 @@ insert into wish(user_id, product_id, count) values(1, 1, 3)
 insert into wish(user_id, product_id, count) values(1, 2, 3)
 insert into wish(user_id, product_id, count) values(1, 3, 3)
 insert into wish(user_id, product_id, count) values(1, 4, 3)
+
+insert into options(name, quantity, product_id) values('option1', 100, 1)
+insert into options(name, quantity, product_id) values('option2', 100, 2)

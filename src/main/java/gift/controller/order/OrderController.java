@@ -4,10 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gift.common.annotation.LoginUser;
 import gift.common.auth.LoginInfo;
+import gift.service.OrderService;
 import java.net.URI;
 import java.util.Map;
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,30 +22,15 @@ import org.springframework.web.client.RestClient;
 @RequestMapping("/api/v1/orders")
 public class OrderController {
 
-    private final RestClient restClient;
+    private final OrderService orderService;
 
-    public OrderController() {
-        this.restClient = RestClient.builder().build();
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
     }
 
     @PostMapping("")
-    public void order(@LoginUser LoginInfo user, @RequestBody OrderRequest request) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        var url = "https://kapi.kakao.com/v2/api/talk/memo/default/send";
-
-        TextTemplate textTemplate = new TextTemplate("text", "a", new Link("http://localhost:8080"));
-        String jsonTemplate = objectMapper.writeValueAsString(textTemplate);
-        MultiValueMap<Object, Object> map = new LinkedMultiValueMap<>();
-        map.set("template_object", jsonTemplate);
-
-        var response = restClient.post()
-            .uri(URI.create(url))
-            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-            .header("Authorization", "Bearer " + user.kakaoToken())
-            .body(map)
-            .retrieve()
-            .toEntity(String.class);
-
-        System.out.println(response);
+    public ResponseEntity<OrderResponse> order(@LoginUser LoginInfo user, @RequestBody OrderRequest request) {
+        OrderResponse response = orderService.order(user.kakaoToken(), request);
+        return ResponseEntity.created(URI.create("/api/v1/orders/" + response.id())).body(response);
     }
 }

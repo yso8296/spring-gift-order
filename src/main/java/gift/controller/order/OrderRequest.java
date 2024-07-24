@@ -1,5 +1,10 @@
 package gift.controller.order;
 
+import gift.model.Option;
+import gift.model.Order;
+import gift.model.Product;
+import gift.model.User;
+import gift.model.Wish;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,4 +18,7 @@ public record OrderRequest(
     String message
     ) {
 
+    public Order toEntity(Option option) {
+        return new Order(option, quantity, message);
+    }
 }

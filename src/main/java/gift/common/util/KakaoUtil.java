@@ -1,11 +1,18 @@
 package gift.common.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import gift.controller.oauth.KakaoProperties;
+import gift.controller.order.Link;
+import gift.controller.order.OrderRequest;
+import gift.controller.order.TextTemplate;
 import java.net.URI;
 import java.util.Map;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -14,10 +21,12 @@ public class KakaoUtil {
 
     private final KakaoProperties kakaoProperties;
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
-    public KakaoUtil(KakaoProperties kakaoProperties) {
+    public KakaoUtil(KakaoProperties kakaoProperties, ObjectMapper objectMapper) {
         this.kakaoProperties = kakaoProperties;
         this.restClient = RestClient.builder().build();
+        this.objectMapper = objectMapper;
     }
 
     public String extractEmail(String accessToken) {
@@ -46,7 +55,7 @@ public class KakaoUtil {
     }
 
     public String getRequestUrl() {
-        String kakaoLoginUrl = UriComponentsBuilder.fromHttpUrl(kakaoProperties.authUrl())
+        var kakaoLoginUrl = UriComponentsBuilder.fromHttpUrl(kakaoProperties.authUrl())
             .queryParam("scope", "account_email")
             .queryParam("response_type", "code")
             .queryParam("redirect_uri", kakaoProperties.redirectUri())
@@ -55,12 +64,34 @@ public class KakaoUtil {
         return kakaoLoginUrl;
     }
 
-   public LinkedMultiValueMap<String, String> createBody(String code) {
+    public LinkedMultiValueMap<String, String> createBody(String code) {
         var body = new LinkedMultiValueMap<String, String>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", kakaoProperties.clientId());
         body.add("redirect_url", kakaoProperties.redirectUri());
         body.add("code", code);
         return body;
+    }
+
+    public void sendMessage(String kakaoToken, String message) {
+        var url = kakaoProperties.messageUrl();
+        TextTemplate textTemplate = new TextTemplate("text", message,
+            new Link(kakaoProperties.webUrl()));
+        String jsonTemplate = null;
+        try {
+            jsonTemplate = objectMapper.writeValueAsString(textTemplate);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.set("template_object", jsonTemplate);
+
+        var response = restClient.post()
+            .uri(URI.create(url))
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .header("Authorization", "Bearer " + kakaoToken)
+            .body(body)
+            .retrieve();
     }
 }

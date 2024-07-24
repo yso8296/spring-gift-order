@@ -8,7 +8,9 @@ public record KakaoProperties(
     String clientId,
     String authUrl,
     String tokenUrl,
-    String userInfoUrl
+    String userInfoUrl,
+    String webUrl,
+    String messageUrl
 ) {
 
 }
