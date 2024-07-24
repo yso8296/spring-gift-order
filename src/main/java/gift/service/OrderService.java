@@ -1,5 +1,6 @@
 package gift.service;
 
+import gift.common.auth.LoginInfo;
 import gift.common.exception.ErrorCode;
 import gift.common.exception.OptionException;
 import gift.common.util.KakaoUtil;
@@ -9,6 +10,7 @@ import gift.model.Option;
 import gift.model.Order;
 import gift.repository.OptionRepository;
 import gift.repository.OrderRepository;
+import gift.repository.WishRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,24 +19,30 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OptionRepository optionRepository;
+    private final WishRepository wishRepository;
     private KakaoUtil kakaoUtil;
 
     public OrderService(OrderRepository orderRepository, OptionRepository optionRepository,
-        KakaoUtil kakaoUtil) {
+        WishRepository wishRepository, KakaoUtil kakaoUtil) {
         this.orderRepository = orderRepository;
         this.optionRepository = optionRepository;
+        this.wishRepository = wishRepository;
         this.kakaoUtil = kakaoUtil;
     }
 
     @Transactional
-    public OrderResponse order(String kakaoToken, OrderRequest orderRequest) {
+    public OrderResponse order(LoginInfo user, OrderRequest orderRequest) {
         Option option = optionRepository.findById(orderRequest.optionId())
             .orElseThrow(() -> new OptionException(ErrorCode.OPTION_NOT_FOUND));
 
         Order order = orderRepository.save(orderRequest.toEntity(option));
         option.subtractQuantity(orderRequest.quantity());
 
-        kakaoUtil.sendMessage(kakaoToken, orderRequest.message());
+        if (wishRepository.existsByProductIdAndUserId(option.getProduct().getId(), user.id())) {
+            wishRepository.deleteByProductIdAndUserId(option.getProduct().getId(), user.id());
+        }
+
+        kakaoUtil.sendMessage(user.kakaoToken(), orderRequest.message());
 
         return OrderResponse.from(order);
     }
