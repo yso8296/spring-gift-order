@@ -31,7 +31,8 @@ public class UserService {
     }
 
     public String login(UserRequest.Update userRequest) {
-        User user = userRepository.findByEmail(userRequest.email())
+        User user = userRepository.findByEmailAndPassword(userRequest.email(),
+                userRequest.password())
             .orElseThrow(() -> new UserException(
                 ErrorCode.USER_NOT_FOUND));
         return jwtTokenProvider.createToken(user.getEmail());
