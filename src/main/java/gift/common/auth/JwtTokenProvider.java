@@ -1,6 +1,7 @@
 package gift.common.auth;
 
 import gift.common.exception.JwtException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -15,7 +16,7 @@ public class JwtTokenProvider {
     private final String secretKey = "asdsadaaaaaaaaaaaaaaaaaaaaaadfsfdwefafaefweafwsg";
     private final long validityInMilliseconds = 60 * 60 * 1000;  // 1시간
 
-    public String createToken(String email) {
+    public String createToken(String email, String kakaoToken) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
@@ -24,6 +25,7 @@ public class JwtTokenProvider {
             .setIssuedAt(now)
             .setExpiration(validity)
             .claim("email", email)
+            .claim("kakaoToken", kakaoToken)
             .signWith(SignatureAlgorithm.HS256, secretKey)
             .compact();
     }
@@ -48,5 +50,13 @@ public class JwtTokenProvider {
     public String extractEmail(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody()
             .getSubject();
+    }
+
+    public String extractKakaoToken(String token) {
+        return Jwts.parser()
+            .setSigningKey(secretKey)
+            .parseClaimsJws(token)
+            .getBody().get("kakaoToken", String.class);
+
     }
 }

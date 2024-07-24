@@ -1,4 +1,4 @@
 package gift.common.auth;
 
-public record LoginInfo(Long id, String password, String email) {
+public record LoginInfo(Long id, String password, String email, String kakaoToken) {
 }

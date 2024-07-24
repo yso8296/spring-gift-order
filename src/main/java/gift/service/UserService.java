@@ -35,6 +35,6 @@ public class UserService {
                 userRequest.password())
             .orElseThrow(() -> new UserException(
                 ErrorCode.USER_NOT_FOUND));
-        return jwtTokenProvider.createToken(user.getEmail());
+        return jwtTokenProvider.createToken(user.getEmail(), null);
     }
 }

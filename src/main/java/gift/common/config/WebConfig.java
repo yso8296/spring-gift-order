@@ -23,7 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(tokenInterceptor)
-            .excludePathPatterns("/api/v1/uesr/**",
+            .excludePathPatterns("/api/v1/user/**",
                 "/api/v1/kakao/login/**");
     }
 

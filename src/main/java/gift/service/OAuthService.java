@@ -25,6 +25,6 @@ public class OAuthService {
         String email = kakaoUtil.extractEmail(accessToken);
 
         User user = userRepository.findByEmail(email).orElseGet(() -> userRepository.save(new User("", email)));
-        return jwtTokenProvider.createToken(user.getEmail());
+        return jwtTokenProvider.createToken(user.getEmail(), accessToken);
     }
 }
