@@ -16,7 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class OAuthController {
 
     private final KakaoProperties kakaoProperties;
-    private final gift.service.OAuthService OAuthService;
+    private final OAuthService OAuthService;
     private final KakaoUtil kakaoUtil;
 
     public OAuthController(KakaoProperties kakaoProperties, OAuthService OAuthService,
@@ -28,7 +28,7 @@ public class OAuthController {
 
     @GetMapping("")
     public ResponseEntity<Void> login() {
-        String loginUrl = kakaoUtil.requestUrl();
+        String loginUrl = kakaoUtil.getRequestUrl();
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", loginUrl);

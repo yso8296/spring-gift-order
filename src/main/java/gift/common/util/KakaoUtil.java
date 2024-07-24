@@ -45,7 +45,7 @@ public class KakaoUtil {
         return response.get("access_token").toString();
     }
 
-    public String requestUrl() {
+    public String getRequestUrl() {
         String kakaoLoginUrl = UriComponentsBuilder.fromHttpUrl(kakaoProperties.authUrl())
             .queryParam("scope", "account_email")
             .queryParam("response_type", "code")
