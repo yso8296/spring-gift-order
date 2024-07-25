@@ -1,4 +1,4 @@
-package gift.controller.order;
+package gift.controller.order.dto;
 
 import gift.model.Order;
 import java.time.LocalDateTime;
