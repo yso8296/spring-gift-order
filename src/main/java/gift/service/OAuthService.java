@@ -23,7 +23,7 @@ public class OAuthService {
         String accessToken = kakaoUtil.getAccessToken(code);
 
         String email = kakaoUtil.extractEmail(accessToken);
-
+        //
         User user = userRepository.findByEmail(email).orElseGet(() -> userRepository.save(new User("", email)));
         return jwtTokenProvider.createToken(user.getEmail(), accessToken);
     }
