@@ -61,7 +61,7 @@ public class KakaoUtil {
             .build().toString();
         return kakaoLoginUrl;
     }
-
+  
     public LinkedMultiValueMap<String, String> createBody(String code) {
         var body = new LinkedMultiValueMap<String, String>();
         body.add("grant_type", "authorization_code");
