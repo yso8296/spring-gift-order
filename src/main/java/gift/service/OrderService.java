@@ -67,6 +67,7 @@ public class OrderService {
             .orElseThrow(() -> new OAuthException(ErrorCode.TOKEN_NOT_FOUND));
 
         if (user.checkSocialType(SocialType.KAKAO)) {
+            kakaoUtil.checkExpiredAccessToken(token);
             kakaoUtil.sendMessage(token.getAccessToken(), orderRequest.message());
         }
     }

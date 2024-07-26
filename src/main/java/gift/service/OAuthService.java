@@ -5,7 +5,7 @@ import gift.common.enums.SocialType;
 import gift.common.exception.ErrorCode;
 import gift.common.exception.OAuthException;
 import gift.common.util.KakaoUtil;
-import gift.controller.oauth.dto.TokenResponse;
+import gift.controller.oauth.dto.TokenInfoResponse;
 import gift.model.Token;
 import gift.model.User;
 import gift.repository.TokenRepository;
@@ -29,9 +29,10 @@ public class OAuthService {
     }
 
     public String register(String code) {
-        TokenResponse response = kakaoUtil.getToken(code);
+        TokenInfoResponse response = kakaoUtil.getToken(code);
         String accessToken = response.access_token();
         String refreshToken = response.refresh_token();
+        Long expiresIn = response.expires_in();
         String email = kakaoUtil.extractEmail(accessToken);
 
         User user = userRepository.findByEmail(email)
@@ -41,7 +42,7 @@ public class OAuthService {
             throw new OAuthException(ErrorCode.INVALID_SOCIAL_TYPE);
         }
 
-        tokenRepository.save(new Token(accessToken, refreshToken, user));
+        tokenRepository.save(new Token(accessToken, refreshToken, user, expiresIn));
 
         return jwtTokenProvider.createToken(user.getEmail());
     }

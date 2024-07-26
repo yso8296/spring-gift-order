@@ -2,10 +2,11 @@ package gift.common.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import gift.controller.oauth.KakaoProperties;
-import gift.controller.oauth.dto.TokenResponse;
+import gift.common.properties.KakaoProperties;
+import gift.controller.oauth.dto.TokenInfoResponse;
 import gift.controller.order.dto.Link;
 import gift.controller.order.dto.TextTemplate;
+import gift.model.Token;
 import java.net.URI;
 import java.util.Map;
 import org.springframework.http.MediaType;
@@ -41,16 +42,16 @@ public class KakaoUtil {
         return email;
     }
 
-    public TokenResponse getToken(String code) {
+    public TokenInfoResponse getToken(String code) {
         var url = kakaoProperties.tokenUrl();
-        LinkedMultiValueMap<String, String> body = createBody(code);
+        LinkedMultiValueMap<String, String> body = createAccessBody(code);
 
-        TokenResponse response = restClient.post()
+        TokenInfoResponse response = restClient.post()
             .uri(URI.create(url))
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .body(body)
             .retrieve()
-            .toEntity(TokenResponse.class)
+            .toEntity(TokenInfoResponse.class)
             .getBody();
 
         return response;
@@ -66,9 +67,18 @@ public class KakaoUtil {
         return kakaoLoginUrl;
     }
 
-    public LinkedMultiValueMap<String, String> createBody(String code) {
+    public LinkedMultiValueMap<String, String> createAccessBody(String code) {
         var body = new LinkedMultiValueMap<String, String>();
         body.add("grant_type", "authorization_code");
+        body.add("client_id", kakaoProperties.clientId());
+        body.add("redirect_url", kakaoProperties.redirectUri());
+        body.add("code", code);
+        return body;
+    }
+
+    public LinkedMultiValueMap<String, String> createRefreshBody(String code) {
+        var body = new LinkedMultiValueMap<String, String>();
+        body.add("grant_type", "refresh_token");
         body.add("client_id", kakaoProperties.clientId());
         body.add("redirect_url", kakaoProperties.redirectUri());
         body.add("code", code);
@@ -95,5 +105,27 @@ public class KakaoUtil {
             .header("Authorization", "Bearer " + kakaoToken)
             .body(body)
             .retrieve();
+    }
+
+    public TokenInfoResponse refreshAccessToken(String refreshToken) {
+        var url = kakaoProperties.refreshUrl();
+        LinkedMultiValueMap<String, String> body = createRefreshBody(refreshToken);
+
+        TokenInfoResponse response = restClient.post()
+            .uri(URI.create(url))
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .body(body)
+            .retrieve()
+            .toEntity(TokenInfoResponse.class)
+            .getBody();
+
+        return response;
+    }
+
+    public void checkExpiredAccessToken(Token token) {
+        if (token.isTokenExpired()) {
+            TokenInfoResponse response = refreshAccessToken(token.getRefreshToken());
+            token.updateToken(response.access_token(), response.refresh_token(), response.expires_in());
+        }
     }
 }

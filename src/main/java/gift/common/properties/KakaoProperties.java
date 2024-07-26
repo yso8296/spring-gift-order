@@ -1,4 +1,4 @@
-package gift.controller.oauth;
+package gift.common.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -10,7 +10,8 @@ public record KakaoProperties(
     String tokenUrl,
     String userInfoUrl,
     String webUrl,
-    String messageUrl
+    String messageUrl,
+    String refreshUrl
 ) {
 
 }
