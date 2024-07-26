@@ -14,7 +14,6 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity(name = "users")
 public class User extends BaseEntity{
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
