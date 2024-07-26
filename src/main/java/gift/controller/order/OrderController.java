@@ -24,7 +24,7 @@ public class OrderController {
 
     @PostMapping("")
     public ResponseEntity<OrderResponse> order(@LoginUser LoginInfo user, @RequestBody OrderRequest request) {
-        OrderResponse response = orderService.order(user, request);
+        OrderResponse response = orderService.order(user.id(), request);
         return ResponseEntity.created(URI.create("/api/v1/orders/" + response.id())).body(response);
     }
 }

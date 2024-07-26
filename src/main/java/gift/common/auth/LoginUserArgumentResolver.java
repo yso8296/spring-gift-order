@@ -35,8 +35,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String token = request.getHeader("Authorization").substring(7);
         String email = jwtTokenProvider.extractEmail(token);
-        String kakaoToken = jwtTokenProvider.extractKakaoToken(token);
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
-        return new LoginInfo(user.getId(), user.getPassword(), user.getEmail(), kakaoToken);
+        return new LoginInfo(user.getId(), user.getPassword(), user.getEmail());
     }
 }

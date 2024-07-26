@@ -3,6 +3,7 @@ package gift.common.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gift.controller.oauth.KakaoProperties;
+import gift.controller.oauth.dto.TokenResponse;
 import gift.controller.order.dto.Link;
 import gift.controller.order.dto.TextTemplate;
 import java.net.URI;
@@ -40,16 +41,19 @@ public class KakaoUtil {
         return email;
     }
 
-    public String getAccessToken(String code) {
+    public TokenResponse getToken(String code) {
         var url = kakaoProperties.tokenUrl();
         LinkedMultiValueMap<String, String> body = createBody(code);
-        var response = restClient.post()
+
+        TokenResponse response = restClient.post()
             .uri(URI.create(url))
             .contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .body(body)
             .retrieve()
-            .body(Map.class);
-        return response.get("access_token").toString();
+            .toEntity(TokenResponse.class)
+            .getBody();
+
+        return response;
     }
 
     public String getRequestUrl() {

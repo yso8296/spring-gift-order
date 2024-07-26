@@ -1,7 +1,12 @@
 package gift.model;
 
+import gift.common.enums.SocialType;
+import gift.common.exception.ErrorCode;
+import gift.common.exception.OAuthException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,18 +26,17 @@ public class User extends BaseEntity{
     @Column(unique = true)
     private String email;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private SocialType socialType;
+
     protected User() {
     }
 
-    public User(Long id, String password, String email) {
-        this.id = id;
+    public User(String password, String email, SocialType socialType) {
         this.password = password;
         this.email = email;
-    }
-
-    public User(String password, String email) {
-        this.password = password;
-        this.email = email;
+        this.socialType = socialType;
     }
 
     public Long getId() {return id;}
@@ -43,5 +47,13 @@ public class User extends BaseEntity{
 
     public String getEmail() {
         return email;
+    }
+
+    public SocialType getSocialType() {
+        return socialType;
+    }
+
+    public boolean checkSocialType(SocialType socialType) {
+        return this.socialType == socialType;
     }
 }
