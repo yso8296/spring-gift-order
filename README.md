@@ -7,3 +7,52 @@
 - 앱 키, 인가 코드가 절대 유출되지 않도록 한다.
 - 특히 시크릿 키는 GitHub나 클라이언트 코드 등 외부에서 볼 수 있는 곳에 추가하지 않는다.
 - (선택) 인가 코드를 받는 방법이 불편한 경우 카카오 로그인 화면을 구현한다.
+  
+카카오 API를 사용하기 위한 애플리케이션을 등록한다.  
+등록한 후 아래 안내에 따라 설정한다.
+  - 내 애플리케이션 > 제품 설정 > 카카오 로그인 > 활성화 설정 ON (카카오 로그인 활성화 설정)
+  - 내 애플리케이션 > 제품 설정 > 카카오 로그인 > Redirect URI 등록 > http://localhost:8080 저장 (Redirect URI 등록)
+  - 내 애플리케이션 > 제품 설정 > 카카오 로그인 > 동의항목 > 접근권한 > 카카오톡 메시지 전송 > 선택 동의 (접근권한 동의항목)
+## 2단계 기능 요구 사항
+카카오톡 메시지 API를 사용하여 주문하기 기능을 구현한다.
+
+- 주문할 때 수령인에게 보낼 메시지를 작성할 수 있다.
+- 상품 옵션과 해당 수량을 선택하여 주문하면 해당 상품 옵션의 수량이 차감된다.
+- 해당 상품이 위시 리스트에 있는 경우 위시 리스트에서 삭제한다.
+- 나에게 보내기를 읽고 주문 내역을 카카오톡 메시지로 전송한다.
+- 메시지는 메시지 템플릿의 기본 템플릿이나 사용자 정의 템플릿을 사용하여 자유롭게 작성한다.
+
+카카오 API를 사용하기 위한 애플리케이션을 등록한다.  
+등록한 후 아래 안내에 따라 설정한다.
+- 내 애플리케이션 > 제품 설정 > 카카오 로그인 > 활성화 설정 ON (카카오 로그인 활성화 설정)
+- 내 애플리케이션 > 제품 설정 > 카카오 로그인 > Redirect URI 등록 > http://localhost:8080 저장 (Redirect URI 등록)
+- 내 애플리케이션 > 제품 설정 > 카카오 로그인 > 동의항목 > 접근권한 > 카카오톡 메시지 전송 > 선택 동의 (접근권한 동의항목)
+- 내 애플리케이션 > 앱 설정 > Web 플랫폼 등록 > http://localhost:8080 저장 (Web)
+
+아래 예시와 같이 HTTP 메시지를 주고받도록 구현한다.
+
+Request
+```http request
+POST /api/orders HTTP/1.1
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+    "optionId": 1,
+    "quantity": 2,
+    "message": "Please handle this order with care."
+}
+```
+Response
+```http request
+HTTP/1.1 201 Created
+Content-Type: application/json
+
+{
+    "id": 1,
+    "optionId": 1,
+    "quantity": 2,
+    "orderDateTime": "2024-07-21T10:00:00",
+    "message": "Please handle this order with care."
+}
+```

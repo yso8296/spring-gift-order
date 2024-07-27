@@ -1,5 +1,6 @@
 package gift.controller.oauth;
 
+import gift.common.properties.KakaoProperties;
 import gift.common.util.KakaoUtil;
 import gift.service.OAuthService;
 import org.springframework.http.HttpHeaders;
@@ -9,14 +10,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/v1/kakao/login")
 public class OAuthController {
 
     private final KakaoProperties kakaoProperties;
-    private final gift.service.OAuthService OAuthService;
+    private final OAuthService OAuthService;
     private final KakaoUtil kakaoUtil;
 
     public OAuthController(KakaoProperties kakaoProperties, OAuthService OAuthService,
@@ -28,7 +28,7 @@ public class OAuthController {
 
     @GetMapping("")
     public ResponseEntity<Void> login() {
-        String loginUrl = kakaoUtil.requestUrl();
+        String loginUrl = kakaoUtil.getRequestUrl();
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", loginUrl);

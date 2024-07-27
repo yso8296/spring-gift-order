@@ -10,7 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-public class Wish {
+public class Wish extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -79,12 +79,4 @@ public class OptionService {
 
         product.removeOption(option);
     }
-
-    @Transactional
-    public void subtractQuantity(Long optionId, int quantity) {
-        Option option = optionRepository.findById(optionId)
-            .orElseThrow(() -> new OptionException(ErrorCode.OPTION_NOT_FOUND));
-
-        option.subtractQuantity(quantity);
-    }
 }

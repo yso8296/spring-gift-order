@@ -66,14 +66,21 @@ public class GlobalExceptionHandler {
   
     @ExceptionHandler(CategoryException.class)
     public ResponseEntity<ProblemDetail> categoryException(CategoryException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        ProblemDetail problemDetail = ProblemDetail.forStatus(e.getHttpStatus());
         problemDetail.setDetail(e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }
 
     @ExceptionHandler(OptionException.class)
     public ResponseEntity<ProblemDetail> optionException(OptionException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        ProblemDetail problemDetail = ProblemDetail.forStatus(e.getHttpStatus());
+        problemDetail.setDetail(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
+    }
+
+    @ExceptionHandler(OAuthException.class)
+    public ResponseEntity<ProblemDetail> oAuthException(OAuthException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(e.getHttpStatus());
         problemDetail.setDetail(e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problemDetail);
     }

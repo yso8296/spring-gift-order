@@ -10,9 +10,12 @@ insert into product(name, price, image_url, category_id) values ('product4', 300
 insert into product(name, price, image_url, category_id) values ('product5', 3000, 'https://st.kakaocdn.net/product5.jpg', 3)
 insert into product(name, price, image_url, category_id) values ('product6', 3000, 'https://st.kakaocdn.net/product6.jpg', 4)
 
-insert into users(password, email) values ('yso3865', 'yso829612@gmail.com')
+insert into users(password, email, social_Type) values ('yso3865', 'yso829612@gmail.com', 'DEFAULT')
 
 insert into wish(user_id, product_id, count) values(1, 1, 3)
 insert into wish(user_id, product_id, count) values(1, 2, 3)
 insert into wish(user_id, product_id, count) values(1, 3, 3)
 insert into wish(user_id, product_id, count) values(1, 4, 3)
+
+insert into options(name, quantity, product_id) values('option1', 100, 1)
+insert into options(name, quantity, product_id) values('option2', 100, 2)

@@ -1,6 +1,7 @@
 package gift.common.auth;
 
 import gift.common.exception.JwtException;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenProvider {
 
-    private final String secretKey = "asdsadaaaaaaaaaaaaaaaaaaaaaadfsfdwefafaefweafwsg";
+    private final static String secretKey = "asdsadaaaaaaaaaaaaaaaaaaaaaadfsfdwefafaefweafwsg";
     private final long validityInMilliseconds = 60 * 60 * 1000;  // 1시간
 
     public String createToken(String email) {
