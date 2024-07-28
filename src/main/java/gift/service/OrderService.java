@@ -63,10 +63,10 @@ public class OrderService {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new UserException(ErrorCode.USER_NOT_FOUND));
 
-        Token token = tokenRepository.findByUserId(userId)
-            .orElseThrow(() -> new OAuthException(ErrorCode.TOKEN_NOT_FOUND));
-
         if (user.checkSocialType(SocialType.KAKAO)) {
+            Token token = tokenRepository.findByUserId(userId)
+                .orElseThrow(() -> new OAuthException(ErrorCode.TOKEN_NOT_FOUND));
+
             kakaoUtil.checkExpiredAccessToken(token);
             kakaoUtil.sendMessage(token.getAccessToken(), orderRequest.message());
         }

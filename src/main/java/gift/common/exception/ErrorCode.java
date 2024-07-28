@@ -13,6 +13,7 @@ public enum ErrorCode {
     EXIST_WISH(HttpStatus.BAD_REQUEST, "이미 위시 리스트에 추가된 상품입니다."),
 
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 카테고리입니다."),
+    CATEGORY_CANNOT_DELETE(HttpStatus.BAD_REQUEST, "삭제할 수 없는 카테고리입니다."),
 
     OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 옵션입니다."),
     DUPLICATE_OPTION_NAME(HttpStatus.BAD_REQUEST, "중복된 옵션 이름입니다."),

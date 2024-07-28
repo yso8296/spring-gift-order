@@ -60,7 +60,7 @@ public class CategoryService {
     @Transactional
     public void deleteCategory(Long categoryId) {
         if (productRepository.existsByCategoryId(categoryId)) {
-            throw new IllegalArgumentException("삭제할 수 없는 카테고리입니다.");
+            throw new CategoryException(ErrorCode.CATEGORY_CANNOT_DELETE);
         }
 
         if (!categoryRepository.existsById(categoryId)) {
